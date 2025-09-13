@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "sijuk-backend",
-	description: "sijuk-backend",
+	title: "Sijuk - Dashboard",
+	description: "Sijuk - Dashboard",
 };
 
 export default function RootLayout({
