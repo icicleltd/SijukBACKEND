@@ -37,7 +37,7 @@ export default function ProductsPage()
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <RoleGuard allow={["super-admin", "owner"]} fallback={<NotAuthorized />}>
+                <RoleGuard allow={["owner"]} fallback={<NotAuthorized />}>
                     <div className="p-4 lg:p-6">
                         <ClientDataTable<Product, unknown>
                             title="Products"

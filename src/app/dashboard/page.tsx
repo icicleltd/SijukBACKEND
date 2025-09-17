@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { RoleGuard } from "@/lib/roles"
 import type { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link"
 import * as React from "react"
 
 export default function DashboardPage()
@@ -131,7 +132,11 @@ export default function DashboardPage()
         {
             accessorKey: "name",
             header: "Name",
-            cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+            cell: ({ row }) => (
+                <Link href={`/restaurants/${row.original.id}`} className="font-medium hover:underline">
+                    {row.original.name}
+                </Link>
+            ),
         },
         {
             accessorKey: "location",

@@ -54,24 +54,18 @@ export const Permissions: Record<UserRole, {
     "super-admin": {
         routes: [
             "/dashboard",
-            "/restaurants",
             "/users",
-            "/products",
-            "/stock",
-            "/orders",
-            "/pos",
         ],
     },
     admin: {
         routes: [
             "/dashboard",
-            "/restaurants",
-            "/orders",
         ],
     },
     owner: {
         routes: [
             "/dashboard",
+            "/restaurants",
             "/products",
             "/stock",
             "/orders",
@@ -81,7 +75,6 @@ export const Permissions: Record<UserRole, {
     user: {
         routes: [
             "/dashboard",
-            "/orders",
         ],
     },
 }

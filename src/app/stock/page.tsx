@@ -30,7 +30,7 @@ export default function StockPage()
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <RoleGuard allow={["owner", "super-admin"]} fallback={<NotAuthorized />}>
+                <RoleGuard allow={["owner"]} fallback={<NotAuthorized />}>
                     <div className="p-4 lg:p-6">
                         <ClientDataTable<Stock, unknown> title="Stock" columns={columns} data={data} addLabel="Add Stock" />
                     </div>

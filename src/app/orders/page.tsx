@@ -29,7 +29,7 @@ export default function OrdersPage()
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <RoleGuard allow={["super-admin", "admin", "owner", "user"]}>
+                <RoleGuard allow={["owner"]}>
                     <div className="p-4 lg:p-6">
                         <ClientDataTable<Order, unknown> title="Orders" columns={columns} data={data} addLabel="Create Order" />
                     </div>

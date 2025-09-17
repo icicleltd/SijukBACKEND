@@ -15,7 +15,7 @@ export default function POSPage()
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <RoleGuard allow={["owner", "super-admin"]} fallback={<NotAuthorized />}>
+                <RoleGuard allow={["owner"]} fallback={<NotAuthorized />}>
                     <div className="p-4 lg:p-6 grid gap-4 grid-cols-1 md:grid-cols-3">
                         <Card className="md:col-span-2">
                             <CardHeader>
