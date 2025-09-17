@@ -23,6 +23,10 @@ export const appRouter = router({
 	{
 		return { message: "This is private", user: ctx.session.user };
 	}),
+	me: protectedProcedure.query(({ ctx }) =>
+	{
+		return { role: ctx.userRole, userId: ctx.userId, user: ctx.session.user };
+	}),
 	admin: adminRouter,
 	owner: ownerRouter,
 	orders: ordersRouter,

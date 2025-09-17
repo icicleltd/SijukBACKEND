@@ -126,14 +126,47 @@ app.get("/stats", async (c) =>
 
 // tRPC Panel (dev only)
 if (env.NODE_ENV !== "production") {
-	const setupPanel = async () =>
-	{
-		const { renderTrpcPanel } = await import("trpc-panel");
-		const panelHtml = renderTrpcPanel(appRouter, { url: "/trpc", transformer: undefined });
-		app.get("/trpc-panel", (c) => c.html(panelHtml));
-	};
-	// eslint-disable-next-line @typescript-eslint/no-floating-promises
-	setupPanel();
+	const ENABLE_TRPC_PANEL = process.env.ENABLE_TRPC_PANEL === "true";
+	if (ENABLE_TRPC_PANEL) {
+		const setupPanel = async () =>
+		{
+			try {
+				const { renderTrpcPanel } = await import("trpc-panel");
+				// Warning: trpc-panel officially supports tRPC v10 only; v11 may show parse errors.
+				const panelHtml = renderTrpcPanel(appRouter as any, { url: "/trpc", transformer: undefined });
+				app.get("/trpc-panel", (c) => c.html(panelHtml));
+			} catch (err) {
+				console.warn("tRPC Panel unavailable:", err);
+				app.get("/trpc-panel", (c) => c.text("tRPC Panel unavailable. See /docs for OpenAPI."));
+			}
+		};
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		setupPanel();
+	} else {
+		app.get("/trpc-panel", (c) =>
+		{
+			const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>tRPC Panel Disabled</title>
+	<style>body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;max-width:720px;margin:40px auto;padding:0 16px;color:#222} code{background:#f5f5f5;padding:2px 6px;border-radius:4px}</style>
+	</head>
+	<body>
+		<h1>tRPC Panel Disabled</h1>
+		<p>tRPC Panel is disabled by default to avoid noisy parse logs with tRPC v11.</p>
+		<p>Use the OpenAPI docs instead:</p>
+		<ul>
+			<li><a href="/docs">/docs</a></li>
+			<li><a href="/openapi.json">/openapi.json</a></li>
+		</ul>
+		<p>To enable the experimental panel, set <code>ENABLE_TRPC_PANEL=true</code> and reload.</p>
+	</body>
+</html>`;
+			return c.html(html);
+		});
+	}
 }
 
 // OpenAPI JSON

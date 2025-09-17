@@ -25,6 +25,31 @@ export const ownerRouter = router({
         return Restaurant.find({ "owner.ownerUserId": userId }).lean();
     }),
 
+    listProducts: roleProtected(["OWNER", "ADMIN", "SUPER_ADMIN"]).input(
+        z.object({ restaurantId: z.string().optional() }).optional()
+    ).query(async ({ input, ctx }) =>
+    {
+        const filter: any = {};
+        if (ctx.userRole === "OWNER") {
+            // Scope to owned restaurants
+            const owned = await Restaurant.find({ "owner.ownerUserId": ctx.userId }).select({ _id: 1 }).lean();
+            const ownedIds = owned.map((r) => r._id);
+            if (input?.restaurantId) {
+                // ensure requested restaurant belongs to owner
+                if (!ownedIds.some((id) => String(id) === input.restaurantId)) {
+                    throw new Error("Not allowed");
+                }
+                filter.restaurantId = input.restaurantId;
+            } else {
+                filter.restaurantId = { $in: ownedIds };
+            }
+        } else {
+            // Admins/Super Admins can optionally filter by restaurant
+            if (input?.restaurantId) filter.restaurantId = input.restaurantId;
+        }
+        return Product.find(filter).sort({ updatedAt: -1 }).lean();
+    }),
+
     createProduct: roleProtected(["OWNER", "ADMIN", "SUPER_ADMIN"]).input(productInput).mutation(async ({ input, ctx }) =>
     {
         // ensure ownership
