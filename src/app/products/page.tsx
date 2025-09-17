@@ -30,6 +30,7 @@ const data: Product[] = [
 
 export default function ProductsPage()
 {
+    const [rows, setRows] = React.useState<Product[]>(data)
     const [open, setOpen] = React.useState(false)
     return (
         <SidebarProvider style={{ "--sidebar-width": "calc(var(--spacing) * 72)", "--header-height": "calc(var(--spacing) * 12)" } as React.CSSProperties}>
@@ -41,9 +42,12 @@ export default function ProductsPage()
                         <ClientDataTable<Product, unknown>
                             title="Products"
                             columns={columns}
-                            data={data}
+                            data={rows}
                             addLabel="Add Product"
                             onAddClick={() => setOpen(true)}
+                            renderRowActions={(row) => (
+                                <Button variant="ghost" size="sm" onClick={() => setRows((r) => r.filter((x) => x.id !== (row as Product).id))}>Delete</Button>
+                            )}
                         />
                         <Sheet open={open} onOpenChange={setOpen}>
                             <SheetContent>

@@ -6,14 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { IconChevronDown, IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconPlus } from "@tabler/icons-react"
-import
-{
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    getPaginationRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
+import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table"
 import * as React from "react"
 
 type Props<TData, TValue> = {
@@ -23,6 +16,7 @@ type Props<TData, TValue> = {
     addLabel?: string
     onAddClick?: () => void
     searchPlaceholder?: string
+    renderRowActions?: (row: TData) => React.ReactNode
 }
 
 export function ClientDataTable<TData, TValue>({
@@ -32,17 +26,39 @@ export function ClientDataTable<TData, TValue>({
     addLabel = "Add",
     onAddClick,
     searchPlaceholder = "Search...",
+    renderRowActions,
 }: Props<TData, TValue>)
 {
     const [globalFilter, setGlobalFilter] = React.useState("")
     const [pageSize, setPageSize] = React.useState(10)
+    const [sorting, setSorting] = React.useState<SortingState>([])
+
     const table = useReactTable({
         data,
-        columns,
-        state: { globalFilter, pagination: { pageIndex: 0, pageSize } },
+        columns: React.useMemo(() =>
+        {
+            if (!renderRowActions) return columns
+            return [
+                ...columns,
+                {
+                    id: "actions",
+                    header: "",
+                    cell: (ctx: unknown) =>
+                    {
+                        const r = ctx as { row: { original: TData } }
+                        return renderRowActions ? renderRowActions(r.row.original) : null
+                    },
+                    enableSorting: false,
+                } as unknown as ColumnDef<TData, TValue>,
+            ]
+        }, [columns, renderRowActions]),
+        state: { globalFilter, pagination: { pageIndex: 0, pageSize }, sorting },
+        onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
         globalFilterFn: "auto",
     })
 
@@ -93,13 +109,24 @@ export function ClientDataTable<TData, TValue>({
                     <TableHeader className="bg-muted sticky top-0 z-10">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} colSpan={header.colSpan}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) =>
+                                {
+                                    const canSort = header.column.getCanSort?.()
+                                    const sortDir = header.column.getIsSorted?.()
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            onClick={canSort ? header.column.getToggleSortingHandler?.() : undefined}
+                                            className={canSort ? "cursor-pointer select-none" : undefined}
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                            {sortDir ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
