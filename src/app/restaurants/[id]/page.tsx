@@ -107,16 +107,16 @@ export default function RestaurantDetailsPage({ params }: { params: { id: string
             <SidebarInset>
                 <SiteHeader />
 
-                <RoleGuard allow={["owner"]}>
+                <RoleGuard allow={["super-admin"]}>
 
-                    <div className="p-4 lg:p-6 space-y-4">
+                    <div className="p-4 lg:p-6 space-y-6 mb-6">
                         <div className="flex items-center justify-between">
                             <h1 className="text-xl font-semibold">Restaurant {params.id}</h1>
                             <Button size="sm" onClick={onAdd}>Add</Button>
                         </div>
 
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList>
+                            <TabsList className="mb-4">
                                 <TabsTrigger value="products">Products</TabsTrigger>
                                 <TabsTrigger value="stock">Stock</TabsTrigger>
                                 <TabsTrigger value="orders">Orders</TabsTrigger>
@@ -147,7 +147,7 @@ export default function RestaurantDetailsPage({ params }: { params: { id: string
                             <SheetHeader>
                                 <SheetTitle>Add to {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</SheetTitle>
                             </SheetHeader>
-                            <form onSubmit={onSubmit} className="mt-4 space-y-4">
+                            <form onSubmit={onSubmit} className="mt-4 space-y-4 px-4">
                                 {activeTab === "products" && (
                                     <>
                                         <div className="space-y-2">

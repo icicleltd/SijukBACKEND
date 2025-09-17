@@ -65,7 +65,6 @@ export const Permissions: Record<UserRole, {
     owner: {
         routes: [
             "/dashboard",
-            "/restaurants",
             "/products",
             "/stock",
             "/orders",
