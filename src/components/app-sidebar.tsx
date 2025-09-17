@@ -1,39 +1,40 @@
 "use client"
 
-import * as React from "react"
 import
-  {
-    IconCamera,
-    IconChartBar,
-    IconDashboard,
-    IconDatabase,
-    IconFileAi,
-    IconFileDescription,
-    IconFileWord,
-    IconFolder,
-    IconHelp,
-    IconInnerShadowTop,
-    IconListDetails,
-    IconReport,
-    IconSearch,
-    IconSettings,
-    IconUsers,
-  } from "@tabler/icons-react"
+{
+  IconCamera,
+  IconChartBar,
+  IconDashboard,
+  IconDatabase,
+  IconFileAi,
+  IconFileDescription,
+  IconFileWord,
+  IconFolder,
+  IconHelp,
+  IconInnerShadowTop,
+  IconListDetails,
+  IconReport,
+  IconSearch,
+  IconSettings,
+  IconUsers,
+} from "@tabler/icons-react"
+import * as React from "react"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import
-  {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-  } from "@/components/ui/sidebar"
+{
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import { Permissions, useRole } from "@/lib/roles"
 
 const data = {
   user: {
@@ -42,31 +43,13 @@ const data = {
     avatar: "/avatars/chefadmin.jpg"
   },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: IconDashboard
-    },
-    {
-      title: "Orders",
-      url: "/orders",
-      icon: IconListDetails
-    },
-    {
-      title: "Menu Analytics",
-      url: "/menu-analytics",
-      icon: IconChartBar
-    },
-    {
-      title: "Inventory",
-      url: "/inventory",
-      icon: IconFolder
-    },
-    {
-      title: "Staff",
-      url: "/staff",
-      icon: IconUsers
-    }
+    { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
+    { title: "Restaurants", url: "/restaurants", icon: IconFolder },
+    { title: "Users", url: "/users", icon: IconUsers },
+    { title: "Products", url: "/products", icon: IconChartBar },
+    { title: "Stock", url: "/stock", icon: IconDatabase },
+    { title: "Orders", url: "/orders", icon: IconListDetails },
+    { title: "POS", url: "/pos", icon: IconInnerShadowTop },
   ],
   navClouds: [
     {
@@ -154,6 +137,12 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
+  const { role } = useRole()
+  const allowedRoutes = React.useMemo(() => new Set(Permissions[role].routes), [role])
+  const mainItems = React.useMemo(
+    () => data.navMain.filter((i) => Array.from(allowedRoutes).some((r) => i.url.startsWith(r))),
+    [allowedRoutes]
+  )
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -174,7 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={mainItems} />
         <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
