@@ -83,7 +83,7 @@ export function SalesAnalyticsChart({
                         </span>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-orange-50/50 rounded-lg border border-orange-100">
+                    <div className="flex flex-col items-center justify-between p-4 bg-orange-50/50 rounded-lg border border-orange-100">
                         <div className="flex items-center gap-3">
                             <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
                             <span className="text-sm font-medium text-orange-900">Purchase Cost</span>

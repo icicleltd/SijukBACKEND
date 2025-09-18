@@ -175,7 +175,7 @@ export const secondaryStatCards: StatCardData[] = [
 // Utility functions
 export const formatCurrency = (value: number): string =>
 {
-    return `₨ ${value.toLocaleString()}`
+    return `৳${value.toLocaleString()}`
 }
 
 export const formatNumber = (value: number): string =>
