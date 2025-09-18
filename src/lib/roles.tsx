@@ -55,11 +55,16 @@ export const Permissions: Record<UserRole, {
         routes: [
             "/dashboard",
             "/users",
+            "/restaurants",
         ],
     },
     admin: {
         routes: [
             "/dashboard",
+            "/products",
+            "/orders",
+            "/stock",
+            "/pos",
         ],
     },
     owner: {

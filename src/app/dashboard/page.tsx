@@ -137,39 +137,45 @@ export default function DashboardPage()
                     {/* Dashboard Header */}
                     <DashboardHeader />
 
-                    {/* Primary Stats Grid - Enhanced with gradients */}
+                    {/* Primary Stats Grid - Available for all users */}
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                         {primaryStatCards.map((card, index) => (
                             <StatCard key={index} data={card} />
                         ))}
                     </div>
 
-                    {/* Secondary Stats Grid */}
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                        {secondaryStatCards.map((card, index) => (
-                            <StatCard key={index} data={card} />
-                        ))}
-                    </div>
-
-                    {/* Charts Section - Full width layout */}
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        {/* Sales Analytics - Takes 2 columns */}
-                        <div className="lg:col-span-2">
-                            <SalesAnalyticsChart data={mockSalesData} />
+                    {/* Secondary Stats Grid - Admin and above only */}
+                    <RoleGuard allow={["super-admin", "admin", "owner"]}>
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                            {secondaryStatCards.map((card, index) => (
+                                <StatCard key={index} data={card} />
+                            ))}
                         </div>
+                    </RoleGuard>
 
-                        {/* Today's Report - Takes 1 column */}
-                        <div className="lg:col-span-1">
-                            <TodaysReportCard peakHoursData={mockTodayData} />
+                    {/* Charts Section - Owner and above only */}
+                    <RoleGuard allow={["super-admin", "admin", "owner"]}>
+                        <div className="grid gap-6 lg:grid-cols-3">
+                            {/* Sales Analytics - Takes 2 columns */}
+                            <div className="lg:col-span-2">
+                                <SalesAnalyticsChart data={mockSalesData} />
+                            </div>
+
+                            {/* Today's Report - Takes 1 column */}
+                            <div className="lg:col-span-1">
+                                <TodaysReportCard peakHoursData={mockTodayData} />
+                            </div>
                         </div>
-                    </div>
+                    </RoleGuard>
 
-                    {/* Enhanced Restaurant Management Metrics - Full Width */}
-                    <RestaurantMetrics
-                        categoryData={mockCategoryData}
-                        staffMetrics={mockStaffMetrics}
-                        tableMetrics={mockTableMetrics}
-                    />
+                    {/* Restaurant Management Metrics - Admin and above only */}
+                    <RoleGuard allow={["super-admin", "admin", "owner"]}>
+                        <RestaurantMetrics
+                            categoryData={mockCategoryData}
+                            staffMetrics={mockStaffMetrics}
+                            tableMetrics={mockTableMetrics}
+                        />
+                    </RoleGuard>
 
                     {/* Advanced Restaurant Table - Super Admin Only */}
                     <RoleGuard allow={["super-admin"]}>
@@ -183,6 +189,30 @@ export default function DashboardPage()
                                 isOpen={isFormOpen}
                                 onClose={() => setIsFormOpen(false)}
                             />
+                        </div>
+                    </RoleGuard>
+
+                    {/* Simple Dashboard for Regular Users */}
+                    <RoleGuard allow={["user"]}>
+                        <div className="grid gap-6">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                    Welcome to Sijuk Dashboard
+                                </h3>
+                                <p className="text-gray-600 mb-4">
+                                    You have basic access to the dashboard. Contact your administrator for additional permissions.
+                                </p>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="p-4 bg-blue-50 rounded-lg">
+                                        <h4 className="font-medium text-blue-900">Basic Analytics</h4>
+                                        <p className="text-sm text-blue-700 mt-1">View basic restaurant statistics</p>
+                                    </div>
+                                    <div className="p-4 bg-green-50 rounded-lg">
+                                        <h4 className="font-medium text-green-900">Daily Reports</h4>
+                                        <p className="text-sm text-green-700 mt-1">Access daily performance summary</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </RoleGuard>
                 </div>

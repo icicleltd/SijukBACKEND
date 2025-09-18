@@ -8,12 +8,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { RoleGuard } from "@/lib/roles"
+import { RoleGuard, useRole } from "@/lib/roles"
 import * as React from "react"
 import data from "../data.json"
 
+// Mock user assignments - এটা পরে API থেকে আসবে
+const userAssignments = {
+    "admin": [1, 2], // admin user can see restaurant IDs 1, 2
+    "owner": [3, 4], // owner user can see restaurant IDs 3, 4
+}
+
 export default function RestaurantsPage()
 {
+    const { role } = useRole()
     const [open, setOpen] = React.useState(false)
     const [form, setForm] = React.useState({
         name: "",
@@ -28,6 +35,27 @@ export default function RestaurantsPage()
         logoFile: null as File | null,
         coverFile: null as File | null,
     })
+
+    // Filter restaurants based on user role
+    const filteredData = React.useMemo(() =>
+    {
+        const allData = data as unknown as import("zod").z.infer<typeof schema>[]
+
+        if (role === "super-admin") {
+            // Super admin can see all restaurants
+            return allData
+        }
+
+        if (role === "admin" || role === "owner") {
+            // Admin and Owner can only see their assigned restaurants
+            const assignedIds = userAssignments[role as keyof typeof userAssignments] || []
+            return allData.filter(restaurant => assignedIds.includes(restaurant.id))
+        }
+
+        // Regular users see no restaurants
+        return []
+    }, [role])
+
     return (
         <SidebarProvider
             style={{
@@ -38,12 +66,24 @@ export default function RestaurantsPage()
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader />
-                <RoleGuard allow={["super-admin", "admin"]} fallback={<NotAuthorized />}>
+                <RoleGuard allow={["super-admin"]} fallback={<NotAuthorized />}>
                     <div className="flex flex-col gap-6 py-4 md:py-6">
-                        <div className="flex justify-end px-4 lg:px-6">
-                            <Button onClick={() => setOpen(true)}>Add Restaurant</Button>
+                        {/* Header with role indicator */}
+                        <div className="flex items-center justify-between px-4 lg:px-6">
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">Restaurant Management</h1>
+                                <p className="text-gray-600 mt-1">
+                                    {role === "super-admin"
+                                        ? "Manage all restaurants across the platform"
+                                        : `Manage your assigned restaurants`
+                                    }
+                                </p>
+                            </div>
+                            {role === "super-admin" && (
+                                <Button onClick={() => setOpen(true)}>Add Restaurant</Button>
+                            )}
                         </div>
-                        <RestaurantTable data={data as unknown as import("zod").z.infer<typeof schema>[]} />
+                        <RestaurantTable data={filteredData} />
                     </div>
                     <Sheet open={open} onOpenChange={setOpen}>
                         <SheetContent>
